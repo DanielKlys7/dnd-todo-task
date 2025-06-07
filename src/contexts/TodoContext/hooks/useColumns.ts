@@ -20,7 +20,7 @@ export const useColumns = (initialColumns?: Column[]) => {
   const addColumn = () => {
     setColumns((prevColumns) => [
       ...prevColumns,
-      { id: `col-${uuidv4()}`, title: "New Column", todos: [] },
+      { id: `col-${uuidv4()}`, title: "New Column", todos: [], isNew: true },
     ]);
   };
 

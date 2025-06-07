@@ -88,7 +88,7 @@ export const Main = () => {
       >
         <Container>
           <Menu>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center w-full mb-2 lg:mb-5 gap-2">
               <SearchAndFilterBar
                 onSearch={searchTodos}
                 onFilterChange={setFilterStatus}
@@ -110,7 +110,7 @@ export const Main = () => {
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-row w-full flex-wrap items-center gap-2 justify-start lg:justify-end">
               <Button onClick={deleteSelected} disabled={!hasSelectedItems}>
                 Delete
               </Button>
