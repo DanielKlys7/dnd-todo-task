@@ -20,6 +20,9 @@ type ColumnProps = {
   onDeleteColumnClick?: (id: string) => void;
   onColumnNameChange?: (id: string, title: string) => void;
   onSelectAllClick?: (id: string) => void;
+  onColumnInitialChangeName?: (id: string) => void;
+
+  isNew?: boolean;
 };
 
 const Column = React.memo(
@@ -31,6 +34,8 @@ const Column = React.memo(
     onDeleteColumnClick,
     onColumnNameChange,
     onSelectAllClick,
+    onColumnInitialChangeName,
+    isNew,
   }: ColumnProps) => {
     const {
       attributes,
@@ -45,7 +50,6 @@ const Column = React.memo(
       id: id,
     });
 
-    // Combine refs for both sortable and droppable
     const setNodeRef = (element: HTMLElement | null) => {
       setSortableNodeRef(element);
       setDroppableNodeRef(element);
@@ -93,6 +97,8 @@ const Column = React.memo(
             testIdPrefix="column"
             todoCount={todos.length}
             dragHandleProps={listeners}
+            isNewColumn={isNew}
+            onColumnInitialChangeName={onColumnInitialChangeName}
           />
           <div className="flex-1 min-h-0 overflow-y-auto">
             <TodosDisplay id={id} todos={todos} />

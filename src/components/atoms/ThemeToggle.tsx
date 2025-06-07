@@ -1,51 +1,19 @@
 import React from "react";
 
 import { useTheme } from "contexts/ThemeContext";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import { Theme } from "contexts/ThemeContext/types";
 
 export const ThemeToggle: React.FC = () => {
   const { theme, actualTheme, setTheme } = useTheme();
 
   const handleToggle = () => {
-    if (theme === "system") {
-      setTheme(actualTheme === "dark" ? "light" : "dark");
-    } else {
-      setTheme(theme === "light" ? "dark" : "light");
+    if (theme === Theme.DARK) {
+      setTheme(actualTheme === Theme.DARK ? Theme.LIGHT : Theme.DARK);
+      return;
     }
-  };
 
-  const sunIconPath =
-    "M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 " +
-    "001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 " +
-    "011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 " +
-    "106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 " +
-    "011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z";
-
-  const moonIconPath =
-    "M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z";
-
-  const getIcon = () => {
-    if (actualTheme === "dark") {
-      return (
-        <svg
-          className="w-5 h-5"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path fillRule="evenodd" d={sunIconPath} clipRule="evenodd" />
-        </svg>
-      );
-    }
-    return (
-      <svg
-        className="w-5 h-5"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d={moonIconPath} />
-      </svg>
-    );
+    setTheme(theme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT);
   };
 
   return (
@@ -53,13 +21,17 @@ export const ThemeToggle: React.FC = () => {
       onClick={handleToggle}
       className="p-2 rounded-lg bg-primary hover:bg-secondary transition-colors duration-200 text-text shadow-md hover:shadow-lg"
       aria-label={`Switch to ${
-        actualTheme === "light" ? "dark" : "light"
+        actualTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT
       } theme`}
       title={`Current: ${
         theme === "system" ? `System (${actualTheme})` : theme
       }`}
     >
-      {getIcon()}
+      {actualTheme === "dark" ? (
+        <SunIcon className="h-5 w-5" />
+      ) : (
+        <MoonIcon className="h-5 w-5" />
+      )}
     </button>
   );
 };

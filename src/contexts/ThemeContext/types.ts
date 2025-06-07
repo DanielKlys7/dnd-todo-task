@@ -1,7 +1,11 @@
-export type Theme = 'light' | 'dark' | 'system'
+export enum Theme {
+  LIGHT = "light",
+  DARK = "dark",
+  SYSTEM = "system",
+}
 
 export interface ThemeContextType {
-  theme: Theme
-  actualTheme: 'light' | 'dark'
-  setTheme: (theme: Theme) => void
+  theme: Theme;
+  actualTheme: Omit<Theme, "system">;
+  setTheme: (theme: Theme) => void;
 }

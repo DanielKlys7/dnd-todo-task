@@ -6,7 +6,7 @@ interface EditableFormProps {
   handleTitleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleTitleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   testIdPrefix?: string;
-  inputRef?: React.RefObject<HTMLInputElement>; // Added inputRef prop
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const EditableForm: React.FC<EditableFormProps> = ({
@@ -14,7 +14,7 @@ export const EditableForm: React.FC<EditableFormProps> = ({
   handleTitleChange,
   handleTitleSubmit,
   testIdPrefix,
-  inputRef, // Use inputRef
+  inputRef,
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -22,7 +22,7 @@ export const EditableForm: React.FC<EditableFormProps> = ({
     <form
       onSubmit={handleTitleSubmit}
       ref={formRef}
-      className="flex gap-2 items-center border-b-2 border-blue-500 p-1" // Changed to border-b-2
+      className="flex gap-2 items-center border-b-2 border-primary p-1"
     >
       <label
         htmlFor={`${testIdPrefix}-title`}
@@ -30,21 +30,21 @@ export const EditableForm: React.FC<EditableFormProps> = ({
       >{`${testIdPrefix} title`}</label>
       <input
         id={`${testIdPrefix}-title`}
-        ref={inputRef} // Assign ref to input
+        ref={inputRef}
         type="text"
         value={newTitle}
         onChange={handleTitleChange}
         onBlur={() => formRef.current?.requestSubmit()}
-        className="bg-transparent flex-1 min-w-0 outline-none px-1 text-lg font-semibold" // Adjusted styles
+        className="bg-transparent flex-1 min-w-0 outline-none px-1 text-lg font-semibold"
         placeholder="Enter title"
       />
       <button
         type="submit"
-        className="p-1 text-green-600 hover:bg-green-100 rounded-md transition-colors flex-shrink-0"
+        className="p-1 text-primary hover:bg-green-100 rounded-md transition-colors flex-shrink-0"
         title="Save"
         data-testid={`${testIdPrefix}-save-title`}
       >
-        <CheckSolidIcon className="w-5 h-5" /> {/* Changed icon */}
+        <CheckSolidIcon className="w-5 h-5" />
       </button>
     </form>
   );

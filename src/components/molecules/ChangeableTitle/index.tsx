@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  type ChangeEvent,
-  type FormEvent,
-  type RefObject,
-} from "react"; // Added missing types
+import { useEffect, useRef, type RefObject } from "react";
 
 import { useChangeName } from "hooks/useChangeName";
 import { useGetHighlightedText } from "hooks/useGetHighlightedText";
@@ -19,6 +13,7 @@ interface TitleProps {
   testIdPrefix?: string;
   onClickTitle?: () => void;
   isInline?: boolean;
+  isNewColumn?: boolean;
 }
 
 export const ChangeableTitle = ({
@@ -28,6 +23,7 @@ export const ChangeableTitle = ({
   testIdPrefix,
   onClickTitle,
   isInline = false,
+  isNewColumn = false,
 }: TitleProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { getHighlightedText } = useGetHighlightedText();
@@ -52,6 +48,16 @@ export const ChangeableTitle = ({
   const inlineContainerClass = "flex-1 min-w-0";
   const blockContainerClass = "mt-6";
 
+  useEffect(() => {
+    if (isNewColumn) {
+      handleChangeClick();
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }
+  }, [isNewColumn, handleChangeClick]);
+
   return (
     <div
       className={`${commonContainerClass} ${
@@ -63,14 +69,10 @@ export const ChangeableTitle = ({
       {isEditing ? (
         <EditableForm
           newTitle={newTitle}
-          handleTitleChange={
-            handleTitleChange as (event: ChangeEvent<HTMLInputElement>) => void
-          } // Added type assertion
-          handleTitleSubmit={
-            handleTitleSubmit as (event: FormEvent<HTMLFormElement>) => void
-          } // Added type assertion
+          handleTitleChange={handleTitleChange}
+          handleTitleSubmit={handleTitleSubmit}
           testIdPrefix={testIdPrefix}
-          inputRef={inputRef as RefObject<HTMLInputElement>} // Added type assertion
+          inputRef={inputRef as RefObject<HTMLInputElement>}
         />
       ) : (
         <TitleDisplay

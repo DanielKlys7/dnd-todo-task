@@ -22,7 +22,7 @@ export const TitleDisplay = ({
       data-testid={`${testIdPrefix}-changeTitle`}
     >
       <h2
-        className="text-lg font-semibold group-hover:text-blue-600 transition-colors truncate px-1 flex-1 min-w-0"
+        className="text-lg font-semibold group-hover:text-primary transition-colors truncate px-1 flex-1 min-w-0"
         title={title}
       >
         {searchText

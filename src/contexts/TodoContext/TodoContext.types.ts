@@ -3,13 +3,14 @@ export type Todo = {
   title: string;
   isFinished: boolean;
   selected: boolean;
-  isNew?: boolean; // Add isNew flag
+  isNew?: boolean;
 };
 
 export type Column = {
   id: string;
   title: string;
   todos: Todo[];
+  isNew?: boolean;
 };
 
 export enum FilterStatus {

@@ -155,6 +155,7 @@ export const Main = () => {
                   onAddTodoClick={addTodo}
                   onColumnNameChange={updateColumnTitle}
                   onSelectAllClick={selectAllInColumn}
+                  isNew={i.isNew}
                 />
               ))}
               <CreateColumn onAddColumnClick={addColumn} />

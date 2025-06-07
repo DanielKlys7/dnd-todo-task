@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { Draggable } from "components/atoms/icons";
 import { ChangeableTitle } from "components/molecules/ChangeableTitle";
@@ -9,6 +8,7 @@ type ColumnMenuProps = {
   id: string;
   title: string;
   onColumnNameChange?: (newTitle: string) => void;
+  onColumnInitialChangeName?: (id: string) => void;
   testIdPrefix?: string;
   isNewColumn?: boolean;
   todoCount?: number;
@@ -28,12 +28,6 @@ export const ColumnMenu = ({
   todoCount = 0,
   dragHandleProps,
 }: ColumnMenuProps) => {
-
-  useEffect(() => {
-    // Logic for initial focus/select should be handled by ChangeableTitle if needed
-    // For example, by passing an autoFocus prop to ChangeableTitle
-  }, [isNewColumn]);
-
   return (
     <div className="flex items-center justify-between gap-3 group">
       <ChangeableTitle
@@ -45,8 +39,7 @@ export const ColumnMenu = ({
         }}
         testIdPrefix={`${testIdPrefix}-column`}
         isInline={true}
-        // Consider adding an autoFocus prop to ChangeableTitle if needed for isNewColumn
-        // e.g., autoFocus={isNewColumn}
+        isNewColumn={isNewColumn}
       />
 
       <div className="flex items-center gap-1 flex-shrink-0">
