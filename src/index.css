@@ -2,9 +2,10 @@
 
 @theme {
   --color-text: light-dark(#11160e, #ecf1e9);
-  --color-background: light-dark(#fafbf9, #050604);
+  --color-background: light-dark(#fafbf9, #0e2a00);
   --color-primary: light-dark(#7c9c6d, #729263);
   --color-secondary: light-dark(#a7c3b6, #3c584b);
+  --color-ternary: light-dark(#6d7c9c, #637292);
   --color-accent: light-dark(#8fb3ae, #4c706b);
 }
 

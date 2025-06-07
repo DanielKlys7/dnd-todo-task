@@ -14,9 +14,15 @@ export const useTodos = (
           const todoIndex = column.todos.findIndex((j) => j.id === todoId);
 
           if (todoIndex !== -1) {
+            const updatedTodo = { ...todo };
+            if (updatedTodo.isNew) {
+              updatedTodo.isNew = false;
+            }
             return {
               ...column,
-              todos: update(column.todos, { [todoIndex]: { $set: todo } }),
+              todos: update(column.todos, {
+                [todoIndex]: { $set: updatedTodo },
+              }),
             };
           }
         }
@@ -65,7 +71,7 @@ export const useTodos = (
   const addTodo = (columnId: string, todo?: Todo) => {
     const newTodo: Todo = {
       id: todo?.id ?? `todo-${uuidv4()}`,
-      title: todo?.title ?? "", // Set empty title for new todos
+      title: todo?.title ?? "New Todo", // Set empty title for new todos
       isFinished: todo?.isFinished ?? false,
       selected: todo?.selected ?? false,
       isNew: todo?.isNew ?? true, // Set isNew to true for new todos
@@ -148,9 +154,7 @@ export const useTodos = (
             return prevColumns; // Already at the end, no change
           }
           const itemToMove = currentTodos[oldIndex];
-          // Create a new list by removing the item from its old position
           const tempTodos = update(currentTodos, { $splice: [[oldIndex, 1]] });
-          // Add the item to the end of the temporary list
           const finalTodos = update(tempTodos, { $push: [itemToMove] });
 
           const newColumns = [...prevColumns];
@@ -200,7 +204,6 @@ export const useTodos = (
           targetIndex !== undefined ? targetIndex : updatedTargetTodos.length;
         updatedTargetTodos.splice(insertIndex, 0, {
           ...activeTodo,
-          selected: false,
         });
         newColumns[targetColumnIndex] = {
           ...newColumns[targetColumnIndex],
@@ -259,7 +262,7 @@ export const useTodos = (
         todos: updatedSourceTodos,
       };
 
-      const todoToMove: Todo = { ...activeTodo, selected: false };
+      const todoToMove: Todo = { ...activeTodo };
       const finalTargetTodos = [
         ...newColumns[targetColumnIndex].todos,
         todoToMove,

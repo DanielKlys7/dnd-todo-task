@@ -29,10 +29,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     const newActualTheme = getActualTheme();
     setActualTheme(newActualTheme);
 
+    const bodyElement = document.body;
+
     if (newActualTheme === "dark") {
-      document?.getElementById("root")?.setAttribute("data-theme", "dark");
+      bodyElement.setAttribute("data-theme", "dark");
     } else {
-      document?.getElementById("root")?.setAttribute("data-theme", "light");
+      bodyElement.setAttribute("data-theme", "light");
     }
   }, [getActualTheme]);
 

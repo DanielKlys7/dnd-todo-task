@@ -62,16 +62,16 @@ export const ColumnMenu = ({
             <Draggable className="w-5 h-5 text-gray-400" />
           </div>
 
-          {onDeleteColumnClick && (
-            <button
-              onClick={() => onDeleteColumnClick(id)}
-              className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Delete column"
-              data-testid={`${testIdPrefix}-delete`}
-            >
-              <TrashIcon className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (onDeleteColumnClick) onDeleteColumnClick(id);
+            }}
+            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Delete column"
+            data-testid={`${testIdPrefix}-delete`}
+          >
+            <TrashIcon className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>

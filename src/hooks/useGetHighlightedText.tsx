@@ -1,6 +1,7 @@
 export const useGetHighlightedText = () => {
   function getHighlightedText(text: string, highlight: string) {
-    const parts = text.split(new RegExp(`(${highlight})`, "gi"));
+    const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const parts = text.split(new RegExp(`(${escapedHighlight})`, "gi"));
     return (
       <span>
         {parts.map((part, index) =>

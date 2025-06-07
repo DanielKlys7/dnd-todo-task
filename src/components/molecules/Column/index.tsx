@@ -46,7 +46,7 @@ const Column = React.memo(
       isDragging,
     } = useSortable({ id });
 
-    const { setNodeRef: setDroppableNodeRef, isOver } = useDroppable({
+    const { setNodeRef: setDroppableNodeRef } = useDroppable({
       id: id,
     });
 
@@ -70,15 +70,7 @@ const Column = React.memo(
         <div
           className={classNames(
             `flex flex-col h-full rounded-xl bg-secondary py-6 px-8 
-            shrink-0 touch-manipulation w-full overflow-auto md:w-[400px]`,
-            {
-              "shadow-2xl": isDragging,
-            },
-            "mb-5",
-            {
-              "ring-2 ring-accent ring-opacity-75":
-                isOver && todos.length === 0,
-            }
+            shrink-0 touch-manipulation w-full overflow-auto md:w-[400px]`
           )}
           ref={setNodeRef}
           style={style}

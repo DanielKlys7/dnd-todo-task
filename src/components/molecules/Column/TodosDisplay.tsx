@@ -41,8 +41,8 @@ export const TodosDisplay = ({ todos, id }: TodosDisplayProps) => {
             ref={setEmptyDropRef}
             className="text-center text-2xl py-8 lg:py-20 flex-1 flex flex-col items-center justify-center"
           >
-            <EmptyLogo className="fill-red-500 text-color-text opacity-50 w-1/2 h-1/2" />
-            <p className="mt-4 text-color-text opacity-75">
+            <EmptyLogo className="fill-red-500 text-text opacity-50 w-1/2 h-1/2" />
+            <p className="mt-4 text-text opacity-75">
               {searchText || filterStatus !== FilterStatus.ALL
                 ? "No tasks match your query."
                 : "Nothing here yet. Add a new task!"}

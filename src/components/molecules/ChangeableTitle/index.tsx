@@ -14,6 +14,7 @@ interface TitleProps {
   onClickTitle?: () => void;
   isInline?: boolean;
   isNewColumn?: boolean;
+  isNewTodo?: boolean;
 }
 
 export const ChangeableTitle = ({
@@ -24,6 +25,7 @@ export const ChangeableTitle = ({
   onClickTitle,
   isInline = false,
   isNewColumn = false,
+  isNewTodo = false,
 }: TitleProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { getHighlightedText } = useGetHighlightedText();
@@ -49,14 +51,14 @@ export const ChangeableTitle = ({
   const blockContainerClass = "mt-6";
 
   useEffect(() => {
-    if (isNewColumn) {
+    if (isNewColumn || isNewTodo) {
       handleChangeClick();
       if (inputRef.current) {
         inputRef.current.focus();
         inputRef.current.select();
       }
     }
-  }, [isNewColumn, handleChangeClick]);
+  }, [isNewColumn, isNewTodo, handleChangeClick]);
 
   return (
     <div
@@ -81,6 +83,7 @@ export const ChangeableTitle = ({
           getHighlightedText={getHighlightedText}
           handleChangeClick={handleChangeClick}
           testIdPrefix={testIdPrefix}
+          className="cursor-pointer"
         />
       )}
     </div>

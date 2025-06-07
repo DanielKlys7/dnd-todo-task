@@ -31,7 +31,7 @@ export const SearchAndFilterBar = ({
         placeholder="Search todos"
         onChange={(e) => onSearch(e.target.value)}
         className="px-4 py-3 border border-primary rounded-md focus:outline-none 
-        focus:ring-2 focus:ring-accent h-12"
+        focus:ring-2 focus:ring-accent h-12 text-text placeholder:text-neutral-400"
       />
 
       <Select

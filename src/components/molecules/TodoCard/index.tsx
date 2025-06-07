@@ -46,31 +46,23 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
     [transform, transition, isDragging]
   );
 
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (target.tagName === "INPUT" || target.closest("[data-no-select]")) {
-      return;
-    }
-    select(parentId, id);
-  };
-
   return (
     <div
       className={classNames(
         `mt-5 p-4 rounded-xl text-text text-xl flex flex-col 
-         touch-manipulation transition-all duration-200 cursor-pointer`,
+         touch-manipulation`,
         {
-          "bg-accent shadow-md hover:shadow-lg": !todo.selected,
-          "bg-primary border-2 border-primary shadow-lg ring-2 ring-primary ring-opacity-50":
+          "bg-accent shadow-md hover:shadow-lg border border-transparent ring-2 ring-transparent":
+            !todo.selected,
+          "bg-ternary border-2 border-ternary shadow-lg ring-2 ring-ternary ring-opacity-50":
             todo.selected,
           "shadow-2xl": isDragging,
         }
       )}
       ref={setNodeRef}
       style={style}
-      onClick={handleCardClick}
     >
-      <div className="flex justify-between items-center" data-no-select>
+      <div className="flex justify-between items-center">
         <div>
           <input
             type="checkbox"
@@ -102,7 +94,7 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
           handleUpdateTodoName(parentId, todo, newTitle)
         }
         testIdPrefix="todo"
-        onClickTitle={() => select(parentId, id)}
+        isNewTodo={todo.isNew}
       />
     </div>
   );
