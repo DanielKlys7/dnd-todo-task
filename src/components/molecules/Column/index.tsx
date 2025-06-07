@@ -54,7 +54,7 @@ const Column = React.memo(
     const style = useMemo(
       () => ({
         transform: CSS.Transform.toString(transform),
-        transition,
+        transition: isDragging ? "none" : transition,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? 1000 : "auto",
       }),
@@ -67,8 +67,10 @@ const Column = React.memo(
           className={classNames(
             `flex flex-col h-full rounded-xl bg-secondary py-6 px-8 
             shrink-0 touch-manipulation w-full overflow-auto md:w-[400px] first-of-type:ml-10`,
-            "transition-all duration-150 ease-out mb-5",
-            { "shadow-2xl rotate-1": isDragging },
+            {
+              "shadow-2xl": isDragging,
+            },
+            "mb-5",
             {
               "ring-2 ring-accent ring-opacity-75":
                 isOver && todos.length === 0,
@@ -76,13 +78,12 @@ const Column = React.memo(
           )}
           ref={setNodeRef}
           style={style}
+          {...attributes}
         >
           <ColumnMenu
             onDeleteColumnClick={onDeleteColumnClick}
             onSelectAllClick={onSelectAllClick}
             id={id}
-            draggableAttributes={attributes}
-            draggableListeners={listeners}
             title={title}
             onColumnNameChange={(newTitle: string) => {
               if (onColumnNameChange) {
@@ -90,6 +91,8 @@ const Column = React.memo(
               }
             }}
             testIdPrefix="column"
+            todoCount={todos.length}
+            dragHandleProps={listeners}
           />
           <TodosDisplay id={id} todos={todos} />
           <Button

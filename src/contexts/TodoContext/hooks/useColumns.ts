@@ -47,8 +47,9 @@ export const useColumns = (initialColumns?: Column[]) => {
     const oldIndex = columns.findIndex((column) => column.id === activeId);
     const newIndex = columns.findIndex((column) => column.id === overId);
 
-    if (oldIndex !== -1 && newIndex !== -1) {
-      setColumns(arrayMove(columns, oldIndex, newIndex));
+    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+      const reorderedColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(reorderedColumns);
     }
   };
 

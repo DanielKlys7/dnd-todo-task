@@ -49,10 +49,9 @@ export const useMain = () => {
     const activeType = getType(active.id.toString());
     const overType = getType(over?.id.toString());
 
-    // Handle column reordering
     if (activeType === "col" && overType === "col" && active.id !== over.id) {
       reorderColumns(active.id as string, over.id as string);
-      setActiveId(null);
+      setTimeout(() => setActiveId(null), 0);
       return;
     }
 
