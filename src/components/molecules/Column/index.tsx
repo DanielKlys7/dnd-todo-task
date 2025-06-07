@@ -58,7 +58,7 @@ const Column = React.memo(
     const style = useMemo(
       () => ({
         transform: CSS.Transform.toString(transform),
-        transition: isDragging ? "none" : transition,
+        transition: transition,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? 1000 : "auto",
       }),
@@ -70,7 +70,7 @@ const Column = React.memo(
         <div
           className={classNames(
             `flex flex-col h-full rounded-xl bg-secondary py-6 px-8 
-            shrink-0 touch-manipulation w-full overflow-auto md:w-[400px] first-of-type:ml-10`,
+            shrink-0 touch-manipulation w-full overflow-auto md:w-[400px]`,
             {
               "shadow-2xl": isDragging,
             },

@@ -19,7 +19,7 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={handleToggle}
-      className="p-2 rounded-lg bg-primary hover:bg-secondary transition-colors duration-200 text-text shadow-md hover:shadow-lg"
+      className="p-4 rounded-lg bg-primary hover:bg-secondary transition-colors duration-200 text-text shadow-md hover:shadow-lg"
       aria-label={`Switch to ${
         actualTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT
       } theme`}
@@ -28,9 +28,9 @@ export const ThemeToggle: React.FC = () => {
       }`}
     >
       {actualTheme === "dark" ? (
-        <SunIcon className="h-5 w-5" />
+        <SunIcon className="w-4 h-4" />
       ) : (
-        <MoonIcon className="h-5 w-5" />
+        <MoonIcon className="w-4 h-4" />
       )}
     </button>
   );

@@ -47,7 +47,7 @@ export const ColumnMenu = ({
           {onSelectAllClick && todoCount > 1 && (
             <button
               onClick={() => onSelectAllClick(id)}
-              className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg transition-all font-medium whitespace-nowrap"
+              className="px-3 py-1.5 text-sm bg-accent text-text hover:bg-primary rounded-lg transition-all duration-300 font-medium whitespace-nowrap"
               data-testid={`${testIdPrefix}-select-all`}
             >
               Select all

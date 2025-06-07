@@ -6,13 +6,13 @@ export const Actions = ({
   draggableListeners,
 }: ActionsProps) => {
   return (
-    <div className="flex self-end items-center">
+    <>
       {actionItems.map(
         ({ onClick, className, isDraggable, component, testId }, index) => (
           <span
             key={index}
             onClick={onClick}
-            className={`cursor-pointer ${className}`}
+            className={`cursor-pointer hover:bg-secondary p-1 rounded-sm  ${className}`}
             {...(isDraggable
               ? { ...draggableAttributes, ...draggableListeners }
               : {})}
@@ -23,6 +23,6 @@ export const Actions = ({
           </span>
         )
       )}
-    </div>
+    </>
   );
 };

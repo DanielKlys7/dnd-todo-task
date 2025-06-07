@@ -39,7 +39,7 @@ export const TodoActions = ({
         component: <Check />,
         onClick: onFinishedClick,
         id: "finish",
-        className: isFinished ? "text-primary" : "text-accent",
+        className: isFinished ? "text-green-300" : "text-red-500",
         testId: "finishTodo",
       },
     ],
@@ -47,7 +47,7 @@ export const TodoActions = ({
   );
 
   return (
-    <div className="flex items-center space-x-2" data-no-select>
+    <div className="flex items-center space-x-1">
       <Actions
         actionItems={actionItems}
         draggableAttributes={draggableAttributes}

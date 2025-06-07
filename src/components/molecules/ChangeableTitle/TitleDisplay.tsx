@@ -17,12 +17,12 @@ export const TitleDisplay = ({
 }: TitleDisplayProps) => {
   return (
     <div
-      className="flex items-center cursor-pointer group border-b-2 border-transparent p-1"
+      className="flex items-center cursor-pointer border-b-2 border-transparent p-1"
       onClick={handleChangeClick}
       data-testid={`${testIdPrefix}-changeTitle`}
     >
       <h2
-        className="text-lg font-semibold group-hover:text-primary transition-colors truncate px-1 flex-1 min-w-0"
+        className="text-lg text-text font-semibold hover:text-primary transition-colors px-1 flex-1 min-w-0"
         title={title}
       >
         {searchText

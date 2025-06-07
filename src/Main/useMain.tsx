@@ -13,7 +13,6 @@ import { useTodoContext } from "@contexts/TodoContext/useTodoContext";
 
 export const useMain = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [animateDrop, setAnimateDrop] = useState(true);
   const {
     columns,
     reorderTodosInColumn,
@@ -32,7 +31,7 @@ export const useMain = () => {
 
   const onDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id.toString());
-    setAnimateDrop(true); // Default to animating drops at the start of a drag
+    console.log("XD");
   };
 
   const getType = (id: string) => {
@@ -91,14 +90,10 @@ export const useMain = () => {
         }
 
         if (activeColumn.id === overColumn.id) {
-          // Same column reorder
-          setAnimateDrop(true);
           reorderTodosInColumn(activeColumn.id, activeIdStr, overIdStr);
         } else {
-          // Cross-column move (todo to todo)
           isCrossColumnTodoMove = true;
-          setAnimateDrop(false);
-          setActiveId(null); // Clear overlay before moving data
+          setActiveId(null);
           moveTodoBetweenColumns(
             activeIdStr,
             activeColumn.id,
@@ -110,8 +105,6 @@ export const useMain = () => {
         const targetColumnId = overIdStr.replace("-empty", "");
 
         if (activeColumn.id === targetColumnId) {
-          // Move to end of same column
-          setAnimateDrop(true);
           moveTodoBetweenColumns(
             activeIdStr,
             activeColumn.id,
@@ -119,21 +112,16 @@ export const useMain = () => {
             activeColumn.todos.length
           );
         } else {
-          // Cross-column move (todo to column)
           isCrossColumnTodoMove = true;
-          setAnimateDrop(false);
-          setActiveId(null); // Clear overlay before moving data
+          setActiveId(null);
           moveTodoToColumn(activeIdStr, targetColumnId);
         }
       }
     }
 
     if (!isCrossColumnTodoMove) {
-      // For same-column moves, column reorders, or no-op drags
-      setAnimateDrop(true); // Ensure drop animation is enabled
-      setTimeout(() => setActiveId(null), 0); // Defer clearing activeId to allow animation
+      setTimeout(() => setActiveId(null), 0);
     }
-    // If isCrossColumnTodoMove is true, setActiveId(null) and setAnimateDrop(false) were already handled.
   };
 
   return {
@@ -141,6 +129,5 @@ export const useMain = () => {
     sensors: isMobile ? mobileSensors : desktopSensors,
     onDragStart,
     onDragEnd,
-    animateDrop,
   };
 };

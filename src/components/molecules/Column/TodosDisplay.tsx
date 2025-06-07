@@ -4,7 +4,10 @@ import {
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 
-import type { Todo } from "contexts/TodoContext/TodoContext.types";
+import {
+  FilterStatus,
+  type Todo,
+} from "contexts/TodoContext/TodoContext.types";
 import { useTodoContext } from "contexts/TodoContext/useTodoContext";
 
 import { TodoCard } from "../TodoCard";
@@ -20,7 +23,7 @@ export const TodosDisplay = ({ todos, id }: TodosDisplayProps) => {
     id: `${id}-empty`,
     data: { type: "column", columnId: id },
   });
-  const { searchText } = useTodoContext();
+  const { searchText, filterStatus } = useTodoContext();
 
   return (
     <div
@@ -40,8 +43,8 @@ export const TodosDisplay = ({ todos, id }: TodosDisplayProps) => {
           >
             <EmptyLogo className="fill-red-500 text-color-text opacity-50 w-1/2 h-1/2" />
             <p className="mt-4 text-color-text opacity-75">
-              {searchText
-                ? "No tasks match your search."
+              {searchText || filterStatus !== FilterStatus.ALL
+                ? "No tasks match your query."
                 : "Nothing here yet. Add a new task!"}
             </p>
           </div>

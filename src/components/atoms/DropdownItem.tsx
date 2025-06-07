@@ -10,7 +10,7 @@ export const DropdownItem = ({
   return (
     <li
       key={option.value}
-      className="px-4 py-2 text-sm text-text hover:bg-accent cursor-pointer"
+      className="px-4 py-2 text-sm text-text hover:bg-accent cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
       onClick={() => {
         setIsOpen(false);
         option.onClick();

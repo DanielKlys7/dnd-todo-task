@@ -1,8 +1,8 @@
 import {
   DndContext,
   DragOverlay,
-  closestCorners, // Changed from rectIntersection
-  defaultDropAnimation,
+  rectIntersection,
+  defaultDropAnimation, // Changed from rectIntersection
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -58,7 +58,7 @@ const renderDragOverlay = (activeId: string | null, columns: ColumnType[]) => {
 };
 
 export const Main = () => {
-  const { activeId, sensors, onDragStart, onDragEnd, animateDrop } = useMain();
+  const { activeId, sensors, onDragStart, onDragEnd } = useMain();
   const {
     columns,
     addColumn,
@@ -78,19 +78,17 @@ export const Main = () => {
     column.todos.some((todo) => todo.selected)
   );
 
-  const dropAnimationConfig = animateDrop ? defaultDropAnimation : null; // Conditionally set drop animation
-
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-text">
       <DndContext
         sensors={sensors}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        collisionDetection={closestCorners} // Changed from rectIntersection
+        collisionDetection={rectIntersection}
       >
         <Container>
           <Menu>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
               <SearchAndFilterBar
                 onSearch={searchTodos}
                 onFilterChange={setFilterStatus}
@@ -112,35 +110,37 @@ export const Main = () => {
               />
             </div>
 
-            <Button onClick={deleteSelected} disabled={!hasSelectedItems}>
-              Delete
-            </Button>
-            <Button
-              onClick={() => setFinishedStatusOfSelected(true)}
-              disabled={!hasSelectedItems}
-            >
-              Mark Done
-            </Button>
-            <Button
-              onClick={() => setFinishedStatusOfSelected(false)}
-              disabled={!hasSelectedItems}
-            >
-              Mark Undone
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={deleteSelected} disabled={!hasSelectedItems}>
+                Delete
+              </Button>
+              <Button
+                onClick={() => setFinishedStatusOfSelected(true)}
+                disabled={!hasSelectedItems}
+              >
+                Mark Done
+              </Button>
+              <Button
+                onClick={() => setFinishedStatusOfSelected(false)}
+                disabled={!hasSelectedItems}
+              >
+                Mark Undone
+              </Button>
 
-            <DropdownMenu
-              options={columns.map((i) => ({
-                value: i.id,
-                label: i.title,
-                onClick: () => moveSelected(i.id),
-              }))}
-              disabled={!hasSelectedItems}
-            />
+              <DropdownMenu
+                options={columns.map((i) => ({
+                  value: i.id,
+                  label: i.title,
+                  onClick: () => moveSelected(i.id),
+                }))}
+                disabled={!hasSelectedItems}
+              />
 
-            <ThemeToggle />
+              <ThemeToggle />
+            </div>
           </Menu>
 
-          <div className="w-full h-full flex gap-12 my-10 overflow-auto">
+          <div className="w-full h-full flex gap-10 p-6 overflow-auto">
             <SortableContext
               items={[...columns]}
               strategy={horizontalListSortingStrategy}
@@ -158,13 +158,13 @@ export const Main = () => {
                   isNew={i.isNew}
                 />
               ))}
-              <CreateColumn onAddColumnClick={addColumn} />
             </SortableContext>
+            <CreateColumn onAddColumnClick={addColumn} />
           </div>
         </Container>
 
         {createPortal(
-          <DragOverlay dropAnimation={dropAnimationConfig}>
+          <DragOverlay dropAnimation={defaultDropAnimation}>
             {renderDragOverlay(activeId, columns)}
           </DragOverlay>,
           document.body

@@ -19,8 +19,8 @@ export const useColumns = (initialColumns?: Column[]) => {
 
   const addColumn = () => {
     setColumns((prevColumns) => [
-      ...prevColumns.map((column) => ({ ...column, isNew: false })),
-      { id: `col-${uuidv4()}`, title: "New Column", todos: [], isNew: true },
+      ...prevColumns,
+      { id: `col-${uuidv4()}`, title: "New Column", todos: [] },
     ]);
   };
 
@@ -47,18 +47,15 @@ export const useColumns = (initialColumns?: Column[]) => {
     const oldIndex = columns.findIndex((column) => column.id === activeId);
     const newIndex = columns.findIndex((column) => column.id === overId);
 
-    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-      const reorderedColumns = arrayMove(columns, oldIndex, newIndex);
-      setColumns(reorderedColumns);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setColumns(arrayMove(columns, oldIndex, newIndex));
     }
   };
 
   const updateColumnTitle = (columnId: string, newTitle: string) => {
     setColumns((prevColumns) =>
       prevColumns.map((column) =>
-        column.id === columnId
-          ? { ...column, title: newTitle, isNew: false }
-          : column
+        column.id === columnId ? { ...column, title: newTitle } : column
       )
     );
   };
