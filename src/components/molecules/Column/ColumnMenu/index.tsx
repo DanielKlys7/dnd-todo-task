@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { CheckIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { Draggable } from "components/atoms/icons";
+import { ChangeableTitle } from "components/molecules/ChangeableTitle";
 
 type ColumnMenuProps = {
   onDeleteColumnClick: ((id: string) => void) | undefined;
@@ -27,85 +28,26 @@ export const ColumnMenu = ({
   todoCount = 0,
   dragHandleProps,
 }: ColumnMenuProps) => {
-  const [isEditing, setIsEditing] = useState(
-    isNewColumn || title === "New Column"
-  );
-  const [tempTitle, setTempTitle] = useState(title || "New Column");
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if ((isNewColumn || title === "New Column") && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isNewColumn, title]);
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  const handleTitleSave = () => {
-    if (tempTitle.trim() && onColumnNameChange) {
-      onColumnNameChange(tempTitle.trim());
-      setIsEditing(false);
-    }
-  };
-
-  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleTitleSave();
-    }
-    if (e.key === "Escape") {
-      setTempTitle(title);
-      setIsEditing(false);
-    }
-  };
-
-  const handleTitleClick = () => {
-    if (!isEditing) {
-      setIsEditing(true);
-    }
-  };
+    // Logic for initial focus/select should be handled by ChangeableTitle if needed
+    // For example, by passing an autoFocus prop to ChangeableTitle
+  }, [isNewColumn]);
 
   return (
     <div className="flex items-center justify-between gap-3 group">
-      <div className="flex-1 min-w-0">
-        {isEditing ? (
-          <div className="flex items-center gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={tempTitle}
-              onChange={(e) => setTempTitle(e.target.value)}
-              onBlur={handleTitleSave}
-              onKeyDown={handleTitleKeyDown}
-              className="flex-1 text-lg font-semibold bg-transparent border-b-2 border-blue-500 focus:outline-none pb-1 min-w-0"
-              placeholder="Column name"
-              data-testid={`${testIdPrefix}-title-input`}
-            />
-            <button
-              onClick={handleTitleSave}
-              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex-shrink-0"
-              title="Save"
-              data-testid={`${testIdPrefix}-save-title`}
-            >
-              <CheckIcon className="w-5 h-5" />
-            </button>
-          </div>
-        ) : (
-          <h2
-            className="text-lg font-semibold cursor-pointer hover:text-blue-600 transition-colors truncate border-b-2 border-transparent pb-1"
-            onClick={handleTitleClick}
-            title={title}
-            data-testid={`${testIdPrefix}-title`}
-          >
-            {title}
-          </h2>
-        )}
-      </div>
+      <ChangeableTitle
+        title={title}
+        onUpdateTitle={(newTitle) => {
+          if (onColumnNameChange) {
+            onColumnNameChange(newTitle);
+          }
+        }}
+        testIdPrefix={`${testIdPrefix}-column`}
+        isInline={true}
+        // Consider adding an autoFocus prop to ChangeableTitle if needed for isNewColumn
+        // e.g., autoFocus={isNewColumn}
+      />
 
       <div className="flex items-center gap-1 flex-shrink-0">
         <div className="flex items-center gap-1">

@@ -1,7 +1,5 @@
 import React from "react";
 
-import { Pen } from "../../atoms/icons/Pen";
-
 interface TitleDisplayProps {
   title: string;
   searchText?: string;
@@ -18,15 +16,19 @@ export const TitleDisplay = ({
   testIdPrefix,
 }: TitleDisplayProps) => {
   return (
-    <p className="flex items-center">
-      <span
-        className="mr-2 cursor-pointer"
-        onClick={handleChangeClick}
-        data-testid={`${testIdPrefix}-changeTitle`}
+    <div
+      className="flex items-center cursor-pointer group border-b-2 border-transparent p-1"
+      onClick={handleChangeClick}
+      data-testid={`${testIdPrefix}-changeTitle`}
+    >
+      <h2
+        className="text-lg font-semibold group-hover:text-blue-600 transition-colors truncate px-1 flex-1 min-w-0"
+        title={title}
       >
-        <Pen />
-      </span>
-      {searchText ? getHighlightedText(title, searchText) : title}
-    </p>
+        {searchText
+          ? getHighlightedText(title, searchText)
+          : title || "New Title"}
+      </h2>
+    </div>
   );
 };

@@ -13,12 +13,12 @@ import { useTodoContext } from "@contexts/TodoContext/useTodoContext";
 
 export const useMain = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [animateDrop, setAnimateDrop] = useState(true);
   const {
     columns,
     reorderTodosInColumn,
     moveTodoBetweenColumns,
     moveTodoToColumn,
-    moveColumn,
     reorderColumns,
   } = useTodoContext();
 
@@ -32,12 +32,16 @@ export const useMain = () => {
 
   const onDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id.toString());
+    setAnimateDrop(true); // Default to animating drops at the start of a drag
   };
 
   const getType = (id: string) => {
-    if (id.indexOf("todo") > -1) return "todo";
-    if (id.indexOf("col") > -1) return "col";
-    return "page";
+    if (id?.startsWith("todo-")) return "todo";
+    if (id?.startsWith("col-")) {
+      return id.endsWith("-empty") ? "col" : "col";
+    }
+    if (id === "page") return "page";
+    return "unknown";
   };
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
@@ -46,62 +50,29 @@ export const useMain = () => {
       return;
     }
 
-    const activeType = getType(active.id.toString());
-    const overType = getType(over?.id.toString());
+    const activeIdStr = active.id.toString();
+    const overIdStr = over.id.toString();
+    const activeType = getType(activeIdStr);
+    const overType = getType(overIdStr);
 
-    if (activeType === "col" && overType === "col" && active.id !== over.id) {
-      reorderColumns(active.id as string, over.id as string);
-      setTimeout(() => setActiveId(null), 0);
-      return;
-    }
+    let isCrossColumnTodoMove = false;
 
-    if (activeType === "col" && overType === "page") {
-      if (columns.length > 0) {
-        moveColumn(active.id as string, columns[columns.length - 1].id);
+    if (
+      activeType === "col" &&
+      overType === "col" &&
+      activeIdStr !== overIdStr
+    ) {
+      reorderColumns(activeIdStr, overIdStr);
+    } else if (activeType === "col" && overType === "page") {
+      if (
+        columns.length > 0 &&
+        columns[columns.length - 1].id !== activeIdStr
+      ) {
+        reorderColumns(activeIdStr, columns[columns.length - 1].id);
       }
-      setActiveId(null);
-      return;
-    }
-
-    // Handle todo reordering and moving
-    if (activeType === "todo" && overType === "todo") {
+    } else if (activeType === "todo") {
       const activeColumn = columns.find((column) =>
-        column.todos.some((todo) => todo.id === active.id)
-      );
-      const overColumn = columns.find((column) =>
-        column.todos.some((todo) => todo.id === over.id)
-      );
-
-      if (!activeColumn || !overColumn) {
-        setActiveId(null);
-        return;
-      }
-
-      if (activeColumn.id === overColumn.id) {
-        reorderTodosInColumn(
-          activeColumn.id,
-          active.id as string,
-          over.id as string
-        );
-      } else {
-        const overTodoIndex = overColumn.todos.findIndex(
-          (todo) => todo.id === over.id
-        );
-        moveTodoBetweenColumns(
-          active.id as string,
-          activeColumn.id,
-          overColumn.id,
-          overTodoIndex
-        );
-      }
-
-      setActiveId(null);
-      return;
-    }
-
-    if (activeType === "todo" && overType === "col") {
-      const activeColumn = columns.find((column) =>
-        column.todos.some((todo) => todo.id === active.id)
+        column.todos.some((todo) => todo.id === activeIdStr)
       );
 
       if (!activeColumn) {
@@ -109,12 +80,60 @@ export const useMain = () => {
         return;
       }
 
-      if (activeColumn.id !== over.id) {
-        moveTodoToColumn(active.id as string, over.id as string);
+      if (overType === "todo") {
+        const overColumn = columns.find((column) =>
+          column.todos.some((todo) => todo.id === overIdStr)
+        );
+
+        if (!overColumn) {
+          setActiveId(null);
+          return;
+        }
+
+        if (activeColumn.id === overColumn.id) {
+          // Same column reorder
+          setAnimateDrop(true);
+          reorderTodosInColumn(activeColumn.id, activeIdStr, overIdStr);
+        } else {
+          // Cross-column move (todo to todo)
+          isCrossColumnTodoMove = true;
+          setAnimateDrop(false);
+          setActiveId(null); // Clear overlay before moving data
+          moveTodoBetweenColumns(
+            activeIdStr,
+            activeColumn.id,
+            overColumn.id,
+            overColumn.todos.findIndex((todo) => todo.id === overIdStr)
+          );
+        }
+      } else if (overType === "col") {
+        const targetColumnId = overIdStr.replace("-empty", "");
+
+        if (activeColumn.id === targetColumnId) {
+          // Move to end of same column
+          setAnimateDrop(true);
+          moveTodoBetweenColumns(
+            activeIdStr,
+            activeColumn.id,
+            activeColumn.id,
+            activeColumn.todos.length
+          );
+        } else {
+          // Cross-column move (todo to column)
+          isCrossColumnTodoMove = true;
+          setAnimateDrop(false);
+          setActiveId(null); // Clear overlay before moving data
+          moveTodoToColumn(activeIdStr, targetColumnId);
+        }
       }
     }
 
-    setActiveId(null);
+    if (!isCrossColumnTodoMove) {
+      // For same-column moves, column reorders, or no-op drags
+      setAnimateDrop(true); // Ensure drop animation is enabled
+      setTimeout(() => setActiveId(null), 0); // Defer clearing activeId to allow animation
+    }
+    // If isCrossColumnTodoMove is true, setActiveId(null) and setAnimateDrop(false) were already handled.
   };
 
   return {
@@ -122,5 +141,6 @@ export const useMain = () => {
     sensors: isMobile ? mobileSensors : desktopSensors,
     onDragStart,
     onDragEnd,
+    animateDrop,
   };
 };

@@ -3,10 +3,10 @@ import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 export const useChangeName = (initTitle: string, onSucces: () => void) => {
   const ref = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [newTitle, setNewTitle] = useState(initTitle ?? "");
+  const [newTitle, setNewTitle] = useState(initTitle);
 
   const handleChangeClick = () => {
-    setIsEditing((prev) => !prev);
+    setIsEditing(true);
   };
 
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {

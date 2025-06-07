@@ -1,8 +1,7 @@
 import {
   DndContext,
   DragOverlay,
-  type DropAnimation,
-  closestCenter,
+  closestCorners, // Changed from rectIntersection
   defaultDropAnimation,
 } from "@dnd-kit/core";
 import {
@@ -59,7 +58,7 @@ const renderDragOverlay = (activeId: string | null, columns: ColumnType[]) => {
 };
 
 export const Main = () => {
-  const { activeId, sensors, onDragStart, onDragEnd } = useMain();
+  const { activeId, sensors, onDragStart, onDragEnd, animateDrop } = useMain();
   const {
     columns,
     addColumn,
@@ -75,9 +74,11 @@ export const Main = () => {
     moveSelected,
   } = useTodoContext();
 
-  const dropAnimation: DropAnimation = {
-    ...defaultDropAnimation,
-  };
+  const hasSelectedItems = columns.some((column) =>
+    column.todos.some((todo) => todo.selected)
+  );
+
+  const dropAnimationConfig = animateDrop ? defaultDropAnimation : null; // Conditionally set drop animation
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-text">
@@ -85,7 +86,7 @@ export const Main = () => {
         sensors={sensors}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        collisionDetection={closestCenter}
+        collisionDetection={closestCorners} // Changed from rectIntersection
       >
         <Container>
           <Menu>
@@ -111,12 +112,20 @@ export const Main = () => {
               />
             </div>
 
-            <Button onClick={deleteSelected}>Delete selected</Button>
-            <Button onClick={() => setFinishedStatusOfSelected(true)}>
-              Mark selected as finished
+            <Button onClick={deleteSelected} disabled={!hasSelectedItems}>
+              Delete
             </Button>
-            <Button onClick={() => setFinishedStatusOfSelected(false)}>
-              Mark selected as unfinished
+            <Button
+              onClick={() => setFinishedStatusOfSelected(true)}
+              disabled={!hasSelectedItems}
+            >
+              Mark Done
+            </Button>
+            <Button
+              onClick={() => setFinishedStatusOfSelected(false)}
+              disabled={!hasSelectedItems}
+            >
+              Mark Undone
             </Button>
 
             <DropdownMenu
@@ -125,6 +134,7 @@ export const Main = () => {
                 label: i.title,
                 onClick: () => moveSelected(i.id),
               }))}
+              disabled={!hasSelectedItems}
             />
 
             <ThemeToggle />
@@ -153,7 +163,7 @@ export const Main = () => {
         </Container>
 
         {createPortal(
-          <DragOverlay dropAnimation={dropAnimation}>
+          <DragOverlay dropAnimation={dropAnimationConfig}>
             {renderDragOverlay(activeId, columns)}
           </DragOverlay>,
           document.body

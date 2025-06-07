@@ -65,9 +65,10 @@ export const useTodos = (
   const addTodo = (columnId: string, todo?: Todo) => {
     const newTodo: Todo = {
       id: todo?.id ?? `todo-${uuidv4()}`,
-      title: todo?.title ?? "New Todo",
+      title: todo?.title ?? "", // Set empty title for new todos
       isFinished: todo?.isFinished ?? false,
       selected: todo?.selected ?? false,
+      isNew: todo?.isNew ?? true, // Set isNew to true for new todos
     };
 
     setColumns((prevColumns) =>
@@ -109,32 +110,105 @@ export const useTodos = (
     activeId: string,
     sourceColumnId: string,
     targetColumnId: string,
-    targetIndex?: number
+    targetIndex?: number // This is the index in the target column's perspective
   ) => {
     setColumns((prevColumns) => {
-      const activeTodo = prevColumns
-        .find((column) => column.id === sourceColumnId)
-        ?.todos.find((todo) => todo.id === activeId);
+      const sourceColumnIndex = prevColumns.findIndex(
+        (col) => col.id === sourceColumnId
+      );
+      const targetColumnIndex = prevColumns.findIndex(
+        (col) => col.id === targetColumnId
+      );
 
-      if (!activeTodo) return prevColumns;
+      if (sourceColumnIndex === -1) return prevColumns; // Source column not found
 
-      return prevColumns.map((column) => {
-        if (column.id === sourceColumnId) {
-          // Remove todo from source column
-          return {
-            ...column,
-            todos: column.todos.filter((todo) => todo.id !== activeId),
+      const sourceColumn = prevColumns[sourceColumnIndex];
+      const activeTodo = sourceColumn.todos.find(
+        (todo) => todo.id === activeId
+      );
+
+      if (!activeTodo) return prevColumns; // Active todo not found
+
+      // Handle moving within the same column
+      if (sourceColumnId === targetColumnId) {
+        const currentTodos = sourceColumn.todos;
+        const oldIndex = currentTodos.findIndex((t) => t.id === activeId);
+        if (oldIndex === -1) return prevColumns;
+
+        const newIndex = targetIndex;
+
+        // If targetIndex is undefined or explicitly targeting the end (e.g., currentTodos.length)
+        // it means move to the very end of the list.
+        if (newIndex === undefined || newIndex >= currentTodos.length) {
+          // Ensure it's not moving to its own position if already last and target is end
+          if (
+            oldIndex === currentTodos.length - 1 &&
+            (newIndex === undefined || newIndex >= currentTodos.length)
+          ) {
+            return prevColumns; // Already at the end, no change
+          }
+          const itemToMove = currentTodos[oldIndex];
+          // Create a new list by removing the item from its old position
+          const tempTodos = update(currentTodos, { $splice: [[oldIndex, 1]] });
+          // Add the item to the end of the temporary list
+          const finalTodos = update(tempTodos, { $push: [itemToMove] });
+
+          const newColumns = [...prevColumns];
+          newColumns[sourceColumnIndex] = {
+            ...sourceColumn,
+            todos: finalTodos,
           };
-        } else if (column.id === targetColumnId) {
-          // Add todo to target column
-          const newTodos = [...column.todos];
-          const insertIndex =
-            targetIndex !== undefined ? targetIndex : newTodos.length;
-          newTodos.splice(insertIndex, 0, { ...activeTodo, selected: false });
-          return { ...column, todos: newTodos };
+          return newColumns;
         }
-        return column;
-      });
+
+        // Standard reorder within the same column using a valid targetIndex
+        if (newIndex !== undefined && oldIndex !== newIndex) {
+          const reorderedTodos = arrayMove(currentTodos, oldIndex, newIndex);
+          const newColumns = [...prevColumns];
+          newColumns[sourceColumnIndex] = {
+            ...sourceColumn,
+            todos: reorderedTodos,
+          };
+          return newColumns;
+        }
+        return prevColumns; // No change needed if indices are same or targetIndex is invalid for this path
+      } else {
+        // Moving between different columns
+        if (targetColumnIndex === -1) return prevColumns; // Target column not found
+
+        const newColumns = [...prevColumns]; // Create a mutable copy of columns array
+
+        // It's important to get fresh references to source and target columns from newColumns
+        // if their indices could be the same due to a bug elsewhere, though here sourceColumnId !== targetColumnId.
+        const currentSourceColumn = newColumns[sourceColumnIndex];
+        // const currentTargetColumn = newColumns[targetColumnIndex]; // Unused variable
+
+        // Remove from source
+        const updatedSourceTodos = currentSourceColumn.todos.filter(
+          (todo) => todo.id !== activeId
+        );
+        newColumns[sourceColumnIndex] = {
+          ...currentSourceColumn,
+          todos: updatedSourceTodos,
+        };
+
+        // Add to target
+        // Must re-fetch targetColumn from newColumns array if sourceColumnIndex could equal targetColumnIndex
+        // but since they are different, currentTargetColumn is fine.
+        const updatedTargetTodos = [...newColumns[targetColumnIndex].todos]; // Use newColumns[targetColumnIndex] directly
+        const insertIndex =
+          targetIndex !== undefined ? targetIndex : updatedTargetTodos.length;
+        updatedTargetTodos.splice(insertIndex, 0, {
+          ...activeTodo,
+          selected: false,
+        });
+        newColumns[targetColumnIndex] = {
+          ...newColumns[targetColumnIndex],
+          todos: updatedTargetTodos,
+        };
+
+        return newColumns;
+      }
     });
   };
 
@@ -142,45 +216,73 @@ export const useTodos = (
     setColumns((prevColumns) => {
       let activeTodo: Todo | undefined;
       let sourceColumnId: string | undefined;
+      let sourceColumnIndex = -1;
+      let targetColumnIndex = -1;
 
-      // Find the active todo and its source column
-      for (const column of prevColumns) {
-        const todo = column.todos.find((t) => t.id === activeId);
-        if (todo) {
-          activeTodo = todo;
-          sourceColumnId = column.id;
-          break;
+      // Find activeTodo, its source column, and target column indices
+      for (let i = 0; i < prevColumns.length; i++) {
+        const column = prevColumns[i];
+        // Check if targetColumnId is current column first to potentially find it faster
+        if (column.id === targetColumnId) {
+          targetColumnIndex = i;
         }
+        // Check if activeTodo is in current column's todos
+        // This loop structure assumes activeTodo is found before or at the same time as targetColumn,
+        // or iterates fully.
+        if (!activeTodo) {
+          // Only search for activeTodo if not already found
+          const todo = column.todos.find((t) => t.id === activeId);
+          if (todo) {
+            activeTodo = todo;
+            sourceColumnId = column.id;
+            sourceColumnIndex = i;
+          }
+        }
+        // Optimization: if all found, break early
+        if (activeTodo && targetColumnIndex !== -1 && sourceColumnId) break;
       }
 
-      if (!activeTodo || !sourceColumnId || sourceColumnId === targetColumnId) {
+      if (
+        !activeTodo ||
+        !sourceColumnId ||
+        sourceColumnId === targetColumnId ||
+        sourceColumnIndex === -1 ||
+        targetColumnIndex === -1
+      ) {
+        // If trying to move to the same column (should be handled by moveTodoBetweenColumns),
+        // or if todo/columns not found, do nothing.
         return prevColumns;
       }
 
-      // Create the todo to move with proper typing
-      const todoToMove: Todo = {
-        id: activeTodo.id,
-        title: activeTodo.title,
-        isFinished: activeTodo.isFinished,
-        selected: false,
+      const newColumns = [...prevColumns]; // Create a mutable copy
+
+      // It's crucial to get the columns from the `newColumns` array before modification
+      // if sourceColumnIndex could ever be equal to targetColumnIndex (though guarded above).
+      const currentSourceColumn = newColumns[sourceColumnIndex];
+      // const currentTargetColumn = newColumns[targetColumnIndex]; // This was the unused variable, removed its direct assignment
+
+      // Remove from source
+      const updatedSourceTodos = currentSourceColumn.todos.filter(
+        (todo) => todo.id !== activeId
+      );
+      newColumns[sourceColumnIndex] = {
+        ...currentSourceColumn,
+        todos: updatedSourceTodos,
       };
 
-      return prevColumns.map((column) => {
-        if (column.id === sourceColumnId) {
-          // Remove todo from source column
-          return {
-            ...column,
-            todos: column.todos.filter((todo) => todo.id !== activeId),
-          };
-        } else if (column.id === targetColumnId) {
-          // Add todo to target column at the end
-          return {
-            ...column,
-            todos: [...column.todos, todoToMove],
-          };
-        }
-        return column;
-      });
+      // Add to target at the end
+      const todoToMove: Todo = { ...activeTodo, selected: false }; // Ensure selected is reset
+      // Again, get the target column from `newColumns` to ensure modifications are on the copied array state.
+      const finalTargetTodos = [
+        ...newColumns[targetColumnIndex].todos,
+        todoToMove,
+      ];
+      newColumns[targetColumnIndex] = {
+        ...newColumns[targetColumnIndex],
+        todos: finalTargetTodos,
+      };
+
+      return newColumns;
     });
   };
 

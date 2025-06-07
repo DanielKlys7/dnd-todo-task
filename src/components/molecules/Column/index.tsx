@@ -94,7 +94,9 @@ const Column = React.memo(
             todoCount={todos.length}
             dragHandleProps={listeners}
           />
-          <TodosDisplay id={id} todos={todos} />
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <TodosDisplay id={id} todos={todos} />
+          </div>
           <Button
             className="bg-primary text-text font-bold text-xl mt-5 hover:!bg-accent"
             onClick={() => onAddTodoClick && onAddTodoClick(id)}

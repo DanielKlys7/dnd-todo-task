@@ -1,4 +1,10 @@
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  type ChangeEvent,
+  type FormEvent,
+  type RefObject,
+} from "react"; // Added missing types
 
 import { useChangeName } from "hooks/useChangeName";
 import { useGetHighlightedText } from "hooks/useGetHighlightedText";
@@ -11,6 +17,8 @@ interface TitleProps {
   title: string;
   onUpdateTitle: (newTitle: string) => void;
   testIdPrefix?: string;
+  onClickTitle?: () => void;
+  isInline?: boolean;
 }
 
 export const ChangeableTitle = ({
@@ -18,6 +26,8 @@ export const ChangeableTitle = ({
   title,
   onUpdateTitle,
   testIdPrefix,
+  onClickTitle,
+  isInline = false,
 }: TitleProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { getHighlightedText } = useGetHighlightedText();
@@ -34,24 +44,40 @@ export const ChangeableTitle = ({
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
+      inputRef.current.select();
     }
   }, [isEditing]);
 
+  const commonContainerClass = "max-w-[100%]";
+  const inlineContainerClass = "flex-1 min-w-0";
+  const blockContainerClass = "mt-6";
+
   return (
-    <div className="mt-6 max-w-[100%]">
+    <div
+      className={`${commonContainerClass} ${
+        isInline ? inlineContainerClass : blockContainerClass
+      }`}
+      onClick={!isEditing ? onClickTitle : undefined}
+      data-no-select
+    >
       {isEditing ? (
         <EditableForm
           newTitle={newTitle}
-          handleTitleChange={handleTitleChange}
-          handleTitleSubmit={handleTitleSubmit}
+          handleTitleChange={
+            handleTitleChange as (event: ChangeEvent<HTMLInputElement>) => void
+          } // Added type assertion
+          handleTitleSubmit={
+            handleTitleSubmit as (event: FormEvent<HTMLFormElement>) => void
+          } // Added type assertion
           testIdPrefix={testIdPrefix}
+          inputRef={inputRef as RefObject<HTMLInputElement>} // Added type assertion
         />
       ) : (
         <TitleDisplay
           title={title}
           searchText={searchText}
-          handleChangeClick={handleChangeClick}
           getHighlightedText={getHighlightedText}
+          handleChangeClick={handleChangeClick}
           testIdPrefix={testIdPrefix}
         />
       )}

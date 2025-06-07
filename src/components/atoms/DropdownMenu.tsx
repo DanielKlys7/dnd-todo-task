@@ -4,21 +4,24 @@ import { Button } from "./Button";
 
 type DropdownMenuProps = {
   options: { value: string; label: string; onClick: () => void }[];
+  disabled?: boolean;
 };
 
-const DropdownMenu = ({ options }: DropdownMenuProps) => {
+const DropdownMenu = ({ options, disabled = false }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
   };
 
   return (
     <div className="relative">
-      <Button onClick={toggleMenu}>
-        Click to move selected todos to another column
+      <Button onClick={toggleMenu} disabled={disabled}>
+        Move To
       </Button>
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-10 w-full mt-2 bg-background border border-primary rounded-md shadow-lg">
           <ul className="py-1">
             {options.map((option) => (

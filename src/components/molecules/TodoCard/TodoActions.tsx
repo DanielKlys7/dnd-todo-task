@@ -47,10 +47,12 @@ export const TodoActions = ({
   );
 
   return (
-    <Actions
-      actionItems={actionItems}
-      draggableAttributes={draggableAttributes}
-      draggableListeners={draggableListeners}
-    />
+    <div className="flex items-center space-x-2" data-no-select>
+      <Actions
+        actionItems={actionItems}
+        draggableAttributes={draggableAttributes}
+        draggableListeners={draggableListeners}
+      />
+    </div>
   );
 };

@@ -46,24 +46,41 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
     [transform, transition, isDragging]
   );
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent selection when clicking on checkbox, actions, or during editing
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT" || target.closest("[data-no-select]")) {
+      return;
+    }
+    select(parentId, id);
+  };
+
   return (
     <div
       className={classNames(
-        `bg-accent mt-5 p-4 rounded-xl
-         text-text text-xl flex flex-col 
-         touch-manipulation shadow-md hover:shadow-lg transition-shadow duration-200`,
-        { "shadow-2xl": isDragging }
+        `mt-5 p-4 rounded-xl text-text text-xl flex flex-col 
+         touch-manipulation transition-all duration-200 cursor-pointer border-2 border-transparent`,
+        {
+          "bg-accent shadow-md hover:shadow-lg": !todo.selected,
+          "bg-primary border-primary shadow-lg ring-2 ring-primary ring-opacity-50":
+            todo.selected,
+          "shadow-2xl": isDragging,
+        }
       )}
       ref={setNodeRef}
       style={style}
+      onClick={handleCardClick}
     >
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center" data-no-select>
         <div>
           <input
             type="checkbox"
+            className="mr-2 h-5 w-5 cursor-pointer"
             value={`${todo.selected}`}
             checked={todo.selected}
-            onChange={() => select(parentId, id)}
+            onChange={() => {
+              select(parentId, id);
+            }}
           />
         </div>
         <TodoActions
