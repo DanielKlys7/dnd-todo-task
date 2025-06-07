@@ -1,63 +1,83 @@
-import type { DraggableAttributes } from "@dnd-kit/core";
-import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
-import { useMemo } from "react";
+import { Draggable } from "components/atoms/icons";
+import React from "react";
+import { TrashIcon } from "@heroicons/react/24/outline"; // Added TrashIcon import
+import { useTodoContext } from "contexts/TodoContext/useTodoContext";
 
-import { Button } from "components/atoms/Button";
-import { Bin, Draggable } from "components/atoms/icons";
-
-import { Actions } from "../../Actions";
-import type { ActionItem } from "../../Actions/Action.types";
+export type ActionItem = {
+  id: string;
+  onClick: () => void;
+  className?: string;
+  title?: string;
+  "data-testid"?: string;
+  content: React.ReactNode;
+  isVisible?: boolean;
+};
 
 type ColumnActionsProps = {
-  onDeleteColumnClick?: (id: string) => void;
   id: string;
-  onSelectAllClick?: (id: string) => void;
-  draggableAttributes: DraggableAttributes;
-  draggableListeners: SyntheticListenerMap | undefined;
+  testIdPrefix?: string;
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement> & {
+    "data-cypress"?: string;
+  };
+  todoCount?: number;
 };
 
 export const ColumnActions = ({
-  onDeleteColumnClick,
+  dragHandleProps,
   id,
-  onSelectAllClick,
-  draggableAttributes,
-  draggableListeners,
+  testIdPrefix,
+  todoCount = 0,
 }: ColumnActionsProps) => {
-  const actionItems: ActionItem[] = useMemo(
-    () => [
-      {
-        component: <Draggable />,
-        isDraggable: true,
-        id: "drag",
-        testId: "dragColumn",
-      },
-      {
-        component: <Bin />,
-        onClick: () => onDeleteColumnClick && onDeleteColumnClick(id),
-        id: "delete",
-        testId: "deleteColumn",
-      },
-      {
-        component: (
-          <Button
-            onClick={() => onSelectAllClick && onSelectAllClick(id)}
-            className="!bg-transparent border !border-black ml-3"
-          >
-            Select all
-          </Button>
-        ),
-        id: "selectAll",
-        testId: "selectAllColumn",
-      },
-    ],
-    [onDeleteColumnClick, id, onSelectAllClick]
-  );
+  const { deleteColumn, selectAllInColumn } = useTodoContext();
+
+  const columnActions: ActionItem[] = [
+    {
+      id: "select-all",
+      onClick: () => selectAllInColumn && selectAllInColumn(id),
+      className:
+        "px-3 py-1.5 text-sm bg-accent text-text hover:bg-primary rounded-lg transition-all duration-300 font-medium whitespace-nowrap",
+      "data-testid": `${testIdPrefix}-select-all`,
+      content: "Select all",
+      isVisible: !!selectAllInColumn && todoCount > 1,
+    },
+    {
+      id: "delete-column",
+      onClick: () => deleteColumn && deleteColumn(id),
+      className:
+        "p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors",
+      title: "Delete column",
+      "data-testid": `${testIdPrefix}-delete`,
+      content: <TrashIcon className="w-5 h-5" />,
+      isVisible: !!deleteColumn,
+    },
+  ];
 
   return (
-    <Actions
-      actionItems={actionItems}
-      draggableAttributes={draggableAttributes}
-      draggableListeners={draggableListeners}
-    />
+    <div className="flex items-center gap-1 flex-shrink-0">
+      <div className="flex items-center gap-1">
+        {columnActions
+          .filter((action) => action.isVisible)
+          .map((action) => (
+            <button
+              key={action.id}
+              onClick={action.onClick}
+              className={action.className}
+              title={action.title}
+              data-testid={action["data-testid"]}
+            >
+              {action.content}
+            </button>
+          ))}
+        {dragHandleProps && (
+          <div
+            {...dragHandleProps}
+            className="cursor-grab active:cursor-grabbing flex-shrink-0 p-1 hover:bg-gray-100 rounded-md transition-colors"
+            title="Drag to reorder column"
+          >
+            <Draggable className="w-5 h-5 text-gray-400" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

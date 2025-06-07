@@ -55,7 +55,9 @@ export const useColumns = (initialColumns?: Column[]) => {
   const updateColumnTitle = (columnId: string, newTitle: string) => {
     setColumns((prevColumns) =>
       prevColumns.map((column) =>
-        column.id === columnId ? { ...column, title: newTitle } : column
+        column.id === columnId
+          ? { ...column, title: newTitle, isNew: false }
+          : column
       )
     );
   };

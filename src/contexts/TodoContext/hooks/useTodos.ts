@@ -71,10 +71,10 @@ export const useTodos = (
   const addTodo = (columnId: string, todo?: Todo) => {
     const newTodo: Todo = {
       id: todo?.id ?? `todo-${uuidv4()}`,
-      title: todo?.title ?? "New Todo", // Set empty title for new todos
+      title: todo?.title ?? "New Todo",
       isFinished: todo?.isFinished ?? false,
       selected: todo?.selected ?? false,
-      isNew: todo?.isNew ?? true, // Set isNew to true for new todos
+      isNew: todo?.isNew ?? true,
     };
 
     setColumns((prevColumns) =>
@@ -116,7 +116,7 @@ export const useTodos = (
     activeId: string,
     sourceColumnId: string,
     targetColumnId: string,
-    targetIndex?: number // This is the index in the target column's perspective
+    targetIndex?: number
   ) => {
     setColumns((prevColumns) => {
       const sourceColumnIndex = prevColumns.findIndex(
@@ -126,16 +126,15 @@ export const useTodos = (
         (col) => col.id === targetColumnId
       );
 
-      if (sourceColumnIndex === -1) return prevColumns; // Source column not found
+      if (sourceColumnIndex === -1) return prevColumns;
 
       const sourceColumn = prevColumns[sourceColumnIndex];
       const activeTodo = sourceColumn.todos.find(
         (todo) => todo.id === activeId
       );
 
-      if (!activeTodo) return prevColumns; // Active todo not found
+      if (!activeTodo) return prevColumns;
 
-      // Handle moving within the same column
       if (sourceColumnId === targetColumnId) {
         const currentTodos = sourceColumn.todos;
         const oldIndex = currentTodos.findIndex((t) => t.id === activeId);
@@ -143,15 +142,12 @@ export const useTodos = (
 
         const newIndex = targetIndex;
 
-        // If targetIndex is undefined or explicitly targeting the end (e.g., currentTodos.length)
-        // it means move to the very end of the list.
         if (newIndex === undefined || newIndex >= currentTodos.length) {
-          // Ensure it's not moving to its own position if already last and target is end
           if (
             oldIndex === currentTodos.length - 1 &&
             (newIndex === undefined || newIndex >= currentTodos.length)
           ) {
-            return prevColumns; // Already at the end, no change
+            return prevColumns;
           }
           const itemToMove = currentTodos[oldIndex];
           const tempTodos = update(currentTodos, { $splice: [[oldIndex, 1]] });
@@ -165,7 +161,6 @@ export const useTodos = (
           return newColumns;
         }
 
-        // Standard reorder within the same column using a valid targetIndex
         if (newIndex !== undefined && oldIndex !== newIndex) {
           const reorderedTodos = arrayMove(currentTodos, oldIndex, newIndex);
           const newColumns = [...prevColumns];
@@ -175,19 +170,14 @@ export const useTodos = (
           };
           return newColumns;
         }
-        return prevColumns; // No change needed if indices are same or targetIndex is invalid for this path
+        return prevColumns;
       } else {
-        // Moving between different columns
-        if (targetColumnIndex === -1) return prevColumns; // Target column not found
+        if (targetColumnIndex === -1) return prevColumns;
 
-        const newColumns = [...prevColumns]; // Create a mutable copy of columns array
+        const newColumns = [...prevColumns];
 
-        // It's important to get fresh references to source and target columns from newColumns
-        // if their indices could be the same due to a bug elsewhere, though here sourceColumnId !== targetColumnId.
         const currentSourceColumn = newColumns[sourceColumnIndex];
-        // const currentTargetColumn = newColumns[targetColumnIndex]; // Unused variable
 
-        // Remove from source
         const updatedSourceTodos = currentSourceColumn.todos.filter(
           (todo) => todo.id !== activeId
         );
@@ -196,10 +186,7 @@ export const useTodos = (
           todos: updatedSourceTodos,
         };
 
-        // Add to target
-        // Must re-fetch targetColumn from newColumns array if sourceColumnIndex could equal targetColumnIndex
-        // but since they are different, currentTargetColumn is fine.
-        const updatedTargetTodos = [...newColumns[targetColumnIndex].todos]; // Use newColumns[targetColumnIndex] directly
+        const updatedTargetTodos = [...newColumns[targetColumnIndex].todos];
         const insertIndex =
           targetIndex !== undefined ? targetIndex : updatedTargetTodos.length;
         updatedTargetTodos.splice(insertIndex, 0, {

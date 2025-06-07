@@ -2,12 +2,17 @@ import {
   type ChangeEvent,
   type FormEvent,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from "react";
 
-export const useChangeName = (initTitle: string, onSucces: () => void) => {
-  const ref = useRef<HTMLInputElement>(null);
+export const useChangeName = (
+  initTitle: string,
+  onSucces: () => void,
+  isNew: boolean
+) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(initTitle);
 
@@ -25,12 +30,30 @@ export const useChangeName = (initTitle: string, onSucces: () => void) => {
     setIsEditing(false);
   };
 
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  useEffect(() => {
+    if (isNew) {
+      handleChangeClick();
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }
+  }, [isNew, handleChangeClick]);
+
   return {
     isEditing,
     newTitle,
     handleChangeClick,
     handleTitleChange,
     handleTitleSubmit,
-    ref,
+
+    inputRef,
   };
 };

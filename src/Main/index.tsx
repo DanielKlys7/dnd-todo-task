@@ -2,7 +2,7 @@ import {
   DndContext,
   DragOverlay,
   rectIntersection,
-  defaultDropAnimation, // Changed from rectIntersection
+  defaultDropAnimation,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -62,13 +62,9 @@ export const Main = () => {
   const {
     columns,
     addColumn,
-    deleteColumn,
-    addTodo,
     searchTodos,
-    updateColumnTitle,
     filterStatus,
     setFilterStatus,
-    selectAllInColumn,
     deleteSelected,
     setFinishedStatusOfSelected,
     moveSelected,
@@ -151,10 +147,6 @@ export const Main = () => {
                   title={i.title}
                   todos={i.todos}
                   id={i.id}
-                  onDeleteColumnClick={deleteColumn}
-                  onAddTodoClick={addTodo}
-                  onColumnNameChange={updateColumnTitle}
-                  onSelectAllClick={selectAllInColumn}
                   isNew={i.isNew}
                 />
               ))}

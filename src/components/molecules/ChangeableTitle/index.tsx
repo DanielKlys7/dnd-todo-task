@@ -1,10 +1,11 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { type RefObject } from "react";
 
 import { useChangeName } from "hooks/useChangeName";
 import { useGetHighlightedText } from "hooks/useGetHighlightedText";
 
 import { EditableForm } from "./EditableForm";
 import { TitleDisplay } from "./TitleDisplay";
+import classNames from "classnames";
 
 interface TitleProps {
   searchText?: string;
@@ -13,8 +14,7 @@ interface TitleProps {
   testIdPrefix?: string;
   onClickTitle?: () => void;
   isInline?: boolean;
-  isNewColumn?: boolean;
-  isNewTodo?: boolean;
+  isNew?: boolean;
 }
 
 export const ChangeableTitle = ({
@@ -24,10 +24,8 @@ export const ChangeableTitle = ({
   testIdPrefix,
   onClickTitle,
   isInline = false,
-  isNewColumn = false,
-  isNewTodo = false,
+  isNew = false,
 }: TitleProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const { getHighlightedText } = useGetHighlightedText();
   const {
     isEditing,
@@ -35,36 +33,21 @@ export const ChangeableTitle = ({
     handleTitleSubmit,
     newTitle,
     handleChangeClick,
-  } = useChangeName(title, () => {
-    onUpdateTitle(newTitle);
-  });
-
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  const commonContainerClass = "max-w-[100%]";
-  const inlineContainerClass = "flex-1 min-w-0";
-  const blockContainerClass = "mt-6";
-
-  useEffect(() => {
-    if (isNewColumn || isNewTodo) {
-      handleChangeClick();
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-      }
-    }
-  }, [isNewColumn, isNewTodo, handleChangeClick]);
+    inputRef,
+  } = useChangeName(
+    title,
+    () => {
+      onUpdateTitle(newTitle);
+    },
+    isNew
+  );
 
   return (
     <div
-      className={`${commonContainerClass} ${
-        isInline ? inlineContainerClass : blockContainerClass
-      }`}
+      className={classNames("max-w-full", {
+        "flex-1 min-w-0": isInline,
+        "mt-6": !isInline,
+      })}
       onClick={!isEditing ? onClickTitle : undefined}
       data-no-select
     >

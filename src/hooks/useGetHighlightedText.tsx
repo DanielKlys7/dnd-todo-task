@@ -6,7 +6,7 @@ export const useGetHighlightedText = () => {
       <span>
         {parts.map((part, index) =>
           part.toLowerCase() === highlight.toLowerCase() ? (
-            <span key={`${part}${index}`} className="bg-red-500">
+            <span key={`${part}${index}`} className="bg-background">
               {part}
             </span>
           ) : (

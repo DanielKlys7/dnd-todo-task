@@ -31,7 +31,6 @@ export const useMain = () => {
 
   const onDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id.toString());
-    console.log("XD");
   };
 
   const getType = (id: string) => {

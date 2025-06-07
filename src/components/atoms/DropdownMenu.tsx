@@ -34,6 +34,7 @@ const DropdownMenu = ({ options, disabled = false }: DropdownMenuProps) => {
           <ul className="py-1">
             {options.map((option) => (
               <DropdownItem
+                key={option.value}
                 option={option}
                 setIsOpen={(isOpen) => setIsOpen(isOpen)}
               />

@@ -1,8 +1,4 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 import classNames from "classnames";
-import { useMemo } from "react";
 import React from "react";
 
 import type { Todo } from "contexts/TodoContext/TodoContext.types";
@@ -11,17 +7,12 @@ import { Button } from "components/atoms/Button";
 
 import { ColumnMenu } from "./ColumnMenu";
 import { TodosDisplay } from "./TodosDisplay";
+import { useColumn } from "./useColumn";
 
 type ColumnProps = {
   title: string;
   todos: Todo[];
   id: string;
-  onAddTodoClick?: (id: string) => void;
-  onDeleteColumnClick?: (id: string) => void;
-  onColumnNameChange?: (id: string, title: string) => void;
-  onSelectAllClick?: (id: string) => void;
-  onColumnInitialChangeName?: (id: string) => void;
-
   isNew?: boolean;
 };
 
@@ -30,79 +21,52 @@ const Column = React.memo(
     title,
     todos,
     id,
-    onAddTodoClick,
-    onDeleteColumnClick,
-    onColumnNameChange,
-    onSelectAllClick,
-    onColumnInitialChangeName,
+
     isNew,
   }: ColumnProps) => {
     const {
       attributes,
       listeners,
-      setNodeRef: setSortableNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({ id });
-
-    const { setNodeRef: setDroppableNodeRef } = useDroppable({
-      id: id,
-    });
-
-    const setNodeRef = (element: HTMLElement | null) => {
-      setSortableNodeRef(element);
-      setDroppableNodeRef(element);
-    };
-
-    const style = useMemo(
-      () => ({
-        transform: CSS.Transform.toString(transform),
-        transition: transition,
-        opacity: isDragging ? 0 : 1,
-        zIndex: isDragging ? 1000 : "auto",
-      }),
-      [transform, transition, isDragging]
-    );
+      setNodeRef,
+      style,
+      handleAddTodo,
+      handleColumnNameChange,
+    } = useColumn(id);
 
     return (
-      <>
-        <div
-          className={classNames(
-            `flex flex-col h-full rounded-xl bg-secondary py-6 px-8 
+      <div
+        className={classNames(
+          `flex flex-col h-full rounded-xl bg-secondary py-6 px-8 
             shrink-0 touch-manipulation w-full overflow-auto md:w-[400px]`
-          )}
-          ref={setNodeRef}
-          style={style}
-          {...attributes}
-        >
-          <ColumnMenu
-            onDeleteColumnClick={onDeleteColumnClick}
-            onSelectAllClick={onSelectAllClick}
-            id={id}
-            title={title}
-            onColumnNameChange={(newTitle: string) => {
-              if (onColumnNameChange) {
-                onColumnNameChange(id, newTitle);
-              }
-            }}
-            testIdPrefix="column"
-            todoCount={todos.length}
-            dragHandleProps={listeners}
-            isNewColumn={isNew}
-            onColumnInitialChangeName={onColumnInitialChangeName}
-          />
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            <TodosDisplay id={id} todos={todos} />
-          </div>
-          <Button
-            className="bg-primary text-text font-bold text-xl mt-5 hover:!bg-accent"
-            onClick={() => onAddTodoClick && onAddTodoClick(id)}
-          >
-            Add todo
-          </Button>
+        )}
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+      >
+        <ColumnMenu
+          id={id}
+          title={title}
+          onColumnNameChange={(newTitle: string) => {
+            handleColumnNameChange(newTitle);
+          }}
+          testIdPrefix="column"
+          todoCount={todos.length}
+          dragHandleProps={listeners}
+          isNewColumn={isNew}
+          onColumnInitialChangeName={handleColumnNameChange}
+        />
+
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <TodosDisplay id={id} todos={todos} />
         </div>
-      </>
+
+        <Button
+          className="bg-primary text-text font-bold text-xl mt-5 hover:!bg-accent"
+          onClick={handleAddTodo}
+        >
+          Add todo
+        </Button>
+      </div>
     );
   }
 );

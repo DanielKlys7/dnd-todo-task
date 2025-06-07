@@ -6,7 +6,7 @@ interface TitleDisplayProps {
   handleChangeClick: () => void;
   getHighlightedText: (text: string, highlight: string) => React.ReactNode;
   testIdPrefix?: string;
-  className?: string; // Added className prop
+  className?: string;
 }
 
 export const TitleDisplay = ({
@@ -15,18 +15,18 @@ export const TitleDisplay = ({
   handleChangeClick,
   getHighlightedText,
   testIdPrefix,
-  className, // Added className to destructuring
+  className,
 }: TitleDisplayProps) => {
   return (
     <div
       className={`flex items-center cursor-pointer border-b-2 border-transparent p-1 ${
         className || ""
-      }`} // Added className to div
+      }`}
       onClick={handleChangeClick}
       data-testid={`${testIdPrefix}-changeTitle`}
     >
       <h2
-        className="text-lg text-text font-semibold hover:text-primary transition-colors px-1 flex-1 min-w-0 select-none truncate" // Added select-none
+        className="text-lg text-text font-semibold hover:text-primary transition-colors px-1 flex-1 min-w-0 select-none truncate"
         title={title}
       >
         {searchText ? getHighlightedText(title, searchText) : title}

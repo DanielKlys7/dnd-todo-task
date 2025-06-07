@@ -1,14 +1,12 @@
-export const Select = ({
-  options,
-  value,
-  onChange,
-}: {
+type SelectProps = {
   options: { label: string; value: string }[];
   value?: string;
   onChange: (value: string) => void;
   optionKey?: string;
   optionLabel?: string;
-}) => (
+};
+
+export const Select = ({ options, value, onChange }: SelectProps) => (
   <select
     value={value}
     onChange={(e) => {

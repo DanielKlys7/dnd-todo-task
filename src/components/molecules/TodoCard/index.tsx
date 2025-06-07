@@ -48,9 +48,9 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
 
   return (
     <div
+      key={id}
       className={classNames(
-        `mt-5 p-4 rounded-xl text-text text-xl flex flex-col 
-         touch-manipulation`,
+        "mt-5 p-4 rounded-xl text-text text-xl flex flex-col touch-manipulation",
         {
           "bg-accent shadow-md hover:shadow-lg border border-transparent ring-2 ring-transparent":
             !todo.selected,
@@ -94,12 +94,10 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
           handleUpdateTodoName(parentId, todo, newTitle)
         }
         testIdPrefix="todo"
-        isNewTodo={todo.isNew}
+        isNew={todo.isNew}
       />
     </div>
   );
 });
-
-TodoCard.displayName = "TodoCard";
 
 export { TodoCard };

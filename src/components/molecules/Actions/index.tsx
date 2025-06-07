@@ -8,9 +8,9 @@ export const Actions = ({
   return (
     <>
       {actionItems.map(
-        ({ onClick, className, isDraggable, component, testId }, index) => (
+        ({ onClick, className, isDraggable, component, testId }) => (
           <span
-            key={index}
+            key={testId}
             onClick={onClick}
             className={`cursor-pointer hover:bg-secondary p-1 rounded-sm  ${className}`}
             {...(isDraggable

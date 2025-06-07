@@ -3,15 +3,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
+import cx from "classnames";
 
-import {
-  FilterStatus,
-  type Todo,
-} from "contexts/TodoContext/TodoContext.types";
-import { useTodoContext } from "contexts/TodoContext/useTodoContext";
+import type { Todo } from "contexts/TodoContext/TodoContext.types";
 
 import { TodoCard } from "../TodoCard";
-import EmptyLogo from "@components/atoms/svgs/Empty.svg?react";
+import { EmptyState } from "./EmptyState";
 
 type TodosDisplayProps = {
   todos: Todo[];
@@ -23,13 +20,12 @@ export const TodosDisplay = ({ todos, id }: TodosDisplayProps) => {
     id: `${id}-empty`,
     data: { type: "column", columnId: id },
   });
-  const { searchText, filterStatus } = useTodoContext();
 
   return (
     <div
-      className={`flex flex-col ${
-        todos.length === 0 ? "flex-1 min-h-[200px]" : ""
-      }`}
+      className={cx("flex flex-col", {
+        "flex-1 min-h-[200px]": todos.length === 0,
+      })}
     >
       <SortableContext items={todos} strategy={verticalListSortingStrategy}>
         {todos.length ? (
@@ -37,17 +33,7 @@ export const TodosDisplay = ({ todos, id }: TodosDisplayProps) => {
             <TodoCard id={i.id} key={i.id} todo={i} parentId={id} />
           ))
         ) : (
-          <div
-            ref={setEmptyDropRef}
-            className="text-center text-2xl py-8 lg:py-20 flex-1 flex flex-col items-center justify-center"
-          >
-            <EmptyLogo className="fill-red-500 text-text opacity-50 w-1/2 h-1/2" />
-            <p className="mt-4 text-text opacity-75">
-              {searchText || filterStatus !== FilterStatus.ALL
-                ? "No tasks match your query."
-                : "Nothing here yet. Add a new task!"}
-            </p>
-          </div>
+          <EmptyState setEmptyDropRef={setEmptyDropRef} />
         )}
       </SortableContext>
     </div>
