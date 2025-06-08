@@ -8,15 +8,20 @@ export const DropdownItem = ({
   setIsOpen: (value: boolean) => void;
 }) => {
   return (
-    <li
-      key={option.value}
-      className="px-4 py-2 text-sm text-text hover:bg-accent cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
-      onClick={() => {
-        setIsOpen(false);
-        option.onClick();
-      }}
-    >
-      {option.label}
+    <li key={option.value} role="none">
+      <button
+        type="button"
+        role="menuitem"
+        className="w-full text-left px-4 py-2 text-sm text-text hover:bg-accent cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap focus:outline-none focus:bg-accent"
+        onClick={() => {
+          setIsOpen(false);
+          option.onClick();
+        }}
+        data-testid={`dropdown-option-${option.value}`}
+        aria-label={`Move selected todos to ${option.label}`}
+      >
+        {option.label}
+      </button>
     </li>
   );
 };

@@ -41,6 +41,7 @@ const Column = React.memo(
         )}
         ref={setNodeRef}
         style={style}
+        data-testid={`column-${id}`}
         {...attributes}
       >
         <ColumnMenu

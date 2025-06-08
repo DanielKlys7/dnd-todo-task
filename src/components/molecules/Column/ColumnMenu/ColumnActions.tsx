@@ -16,7 +16,7 @@ export type ActionItem = {
 type ColumnActionsProps = {
   id: string;
   testIdPrefix?: string;
-  dragHandleProps?: React.HTMLAttributes<HTMLDivElement> & {
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement> & {
     "data-cypress"?: string;
   };
   todoCount?: number;
@@ -46,7 +46,7 @@ export const ColumnActions = ({
       className:
         "p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors",
       title: "Delete column",
-      "data-testid": `${testIdPrefix}-delete`,
+      "data-testid": "deleteColumn",
       content: <TrashIcon className="w-5 h-5" />,
       isVisible: !!deleteColumn,
     },
@@ -69,13 +69,16 @@ export const ColumnActions = ({
             </button>
           ))}
         {dragHandleProps && (
-          <div
+          <button
             {...dragHandleProps}
-            className="cursor-grab active:cursor-grabbing flex-shrink-0 p-1 hover:bg-gray-100 rounded-md transition-colors"
+            tabIndex={dragHandleProps.tabIndex}
+            className="cursor-grab active:cursor-grabbing flex-shrink-0 p-1 hover:bg-gray-100 rounded-md transition-colors border-0 bg-transparent"
             title="Drag to reorder column"
+            aria-label="Drag to reorder column"
+            type="button"
           >
             <Draggable className="w-5 h-5 text-gray-400" />
-          </div>
+          </button>
         )}
       </div>
     </div>

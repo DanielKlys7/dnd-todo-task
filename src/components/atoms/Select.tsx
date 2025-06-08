@@ -14,7 +14,7 @@ export const Select = ({ options, value, onChange }: SelectProps) => (
       onChange(selectedValue);
     }}
     className="px-4 py-3 border border-primary rounded-md focus:outline-none 
-    focus:ring-2 focus:ring-accent h-12"
+    focus:ring-2 focus:ring-accent h-12 "
   >
     {options.map((option) => (
       <option key={option.value} value={option.value}>

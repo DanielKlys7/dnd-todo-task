@@ -6,12 +6,12 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
   });
 
   return (
-    <div
+    <main
       className="w-screen h-screen flex flex-col"
       ref={setNodeRef}
       data-testid="page"
     >
       {children}
-    </div>
+    </main>
   );
 };

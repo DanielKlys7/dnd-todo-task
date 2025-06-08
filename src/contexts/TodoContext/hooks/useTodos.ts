@@ -18,12 +18,9 @@ export const useTodos = (
             if (updatedTodo.isNew) {
               updatedTodo.isNew = false;
             }
-            return {
-              ...column,
-              todos: update(column.todos, {
-                [todoIndex]: { $set: updatedTodo },
-              }),
-            };
+            return update(column, {
+              todos: { [todoIndex]: { $set: updatedTodo } },
+            });
           }
         }
 
@@ -38,13 +35,15 @@ export const useTodos = (
         const todoIndex = column.todos.findIndex((j) => j.id === todoId);
         const behindIndex = column.todos.findIndex((j) => j.id === behindId);
         if (todoIndex !== -1 && behindIndex !== -1) {
-          const updatedTodos = update(column.todos, {
-            $splice: [
-              [todoIndex, 1],
-              [behindIndex, 0, column.todos[todoIndex]],
-            ],
+          const todoToMove = column.todos[todoIndex];
+          return update(column, {
+            todos: {
+              $splice: [
+                [todoIndex, 1],
+                [behindIndex, 0, todoToMove],
+              ],
+            },
           });
-          return { ...column, todos: updatedTodos };
         }
         return column;
       })
@@ -57,10 +56,7 @@ export const useTodos = (
         if (column.id === columnId) {
           const todoIndex = column.todos.findIndex((j) => j.id === todoId);
           if (todoIndex !== -1) {
-            return {
-              ...column,
-              todos: update(column.todos, { $splice: [[todoIndex, 1]] }),
-            };
+            return update(column, { todos: { $splice: [[todoIndex, 1]] } });
           }
         }
         return column;
@@ -80,7 +76,7 @@ export const useTodos = (
     setColumns((prevColumns) =>
       prevColumns.map((column) => {
         if (column.id === columnId) {
-          return { ...column, todos: [...column.todos, newTodo] };
+          return update(column, { todos: { $push: [newTodo] } });
         }
         return column;
       })
@@ -101,10 +97,9 @@ export const useTodos = (
           const newIndex = column.todos.findIndex((todo) => todo.id === overId);
 
           if (oldIndex !== -1 && newIndex !== -1) {
-            return {
-              ...column,
-              todos: arrayMove(column.todos, oldIndex, newIndex),
-            };
+            return update(column, {
+              todos: { $set: arrayMove(column.todos, oldIndex, newIndex) },
+            });
           }
         }
         return column;
@@ -136,68 +131,61 @@ export const useTodos = (
       if (!activeTodo) return prevColumns;
 
       if (sourceColumnId === targetColumnId) {
-        const currentTodos = sourceColumn.todos;
-        const oldIndex = currentTodos.findIndex((t) => t.id === activeId);
+        const oldIndex = sourceColumn.todos.findIndex((t) => t.id === activeId);
         if (oldIndex === -1) return prevColumns;
 
         const newIndex = targetIndex;
 
-        if (newIndex === undefined || newIndex >= currentTodos.length) {
+        if (newIndex === undefined || newIndex >= sourceColumn.todos.length) {
           if (
-            oldIndex === currentTodos.length - 1 &&
-            (newIndex === undefined || newIndex >= currentTodos.length)
+            oldIndex === sourceColumn.todos.length - 1 &&
+            (newIndex === undefined || newIndex >= sourceColumn.todos.length)
           ) {
-            return prevColumns;
+            return prevColumns; // Already at the end, no change needed
           }
-          const itemToMove = currentTodos[oldIndex];
-          const tempTodos = update(currentTodos, { $splice: [[oldIndex, 1]] });
-          const finalTodos = update(tempTodos, { $push: [itemToMove] });
-
-          const newColumns = [...prevColumns];
-          newColumns[sourceColumnIndex] = {
-            ...sourceColumn,
-            todos: finalTodos,
-          };
-          return newColumns;
+          // Move to the end
+          const itemToMove = sourceColumn.todos[oldIndex];
+          return update(prevColumns, {
+            [sourceColumnIndex]: {
+              todos: {
+                $splice: [[oldIndex, 1]],
+                $push: [itemToMove],
+              },
+            },
+          });
         }
 
         if (newIndex !== undefined && oldIndex !== newIndex) {
-          const reorderedTodos = arrayMove(currentTodos, oldIndex, newIndex);
-          const newColumns = [...prevColumns];
-          newColumns[sourceColumnIndex] = {
-            ...sourceColumn,
-            todos: reorderedTodos,
-          };
-          return newColumns;
+          return update(prevColumns, {
+            [sourceColumnIndex]: {
+              todos: {
+                $set: arrayMove(sourceColumn.todos, oldIndex, newIndex),
+              },
+            },
+          });
         }
         return prevColumns;
       } else {
         if (targetColumnIndex === -1) return prevColumns;
 
-        const newColumns = [...prevColumns];
-
-        const currentSourceColumn = newColumns[sourceColumnIndex];
-
-        const updatedSourceTodos = currentSourceColumn.todos.filter(
-          (todo) => todo.id !== activeId
-        );
-        newColumns[sourceColumnIndex] = {
-          ...currentSourceColumn,
-          todos: updatedSourceTodos,
-        };
-
-        const updatedTargetTodos = [...newColumns[targetColumnIndex].todos];
-        const insertIndex =
-          targetIndex !== undefined ? targetIndex : updatedTargetTodos.length;
-        updatedTargetTodos.splice(insertIndex, 0, {
-          ...activeTodo,
+        const updatedSourceTodos = update(sourceColumn.todos, {
+          $splice: [
+            [sourceColumn.todos.findIndex((todo) => todo.id === activeId), 1],
+          ],
         });
-        newColumns[targetColumnIndex] = {
-          ...newColumns[targetColumnIndex],
-          todos: updatedTargetTodos,
-        };
 
-        return newColumns;
+        const targetColumn = prevColumns[targetColumnIndex];
+        const insertIndex =
+          targetIndex !== undefined ? targetIndex : targetColumn.todos.length;
+
+        const updatedTargetTodos = update(targetColumn.todos, {
+          $splice: [[insertIndex, 0, activeTodo]],
+        });
+
+        return update(prevColumns, {
+          [sourceColumnIndex]: { todos: { $set: updatedSourceTodos } },
+          [targetColumnIndex]: { todos: { $set: updatedTargetTodos } },
+        });
       }
     });
   };
@@ -216,9 +204,9 @@ export const useTodos = (
         }
 
         if (!activeTodo) {
-          const todo = column.todos.find((t) => t.id === activeId);
-          if (todo) {
-            activeTodo = todo;
+          const todoIndex = column.todos.findIndex((t) => t.id === activeId);
+          if (todoIndex !== -1) {
+            activeTodo = column.todos[todoIndex];
             sourceColumnId = column.id;
             sourceColumnIndex = i;
           }
@@ -237,30 +225,21 @@ export const useTodos = (
         return prevColumns;
       }
 
-      const newColumns = [...prevColumns];
+      const sourceColumn = prevColumns[sourceColumnIndex];
+      const todoToMove = { ...activeTodo }; // Ensure we have a fresh copy
 
-      const currentSourceColumn = newColumns[sourceColumnIndex];
-
-      const updatedSourceTodos = currentSourceColumn.todos.filter(
-        (todo) => todo.id !== activeId
-      );
-      newColumns[sourceColumnIndex] = {
-        ...currentSourceColumn,
-        todos: updatedSourceTodos,
-      };
-
-      const todoToMove: Todo = { ...activeTodo };
-      const finalTargetTodos = [
-        ...newColumns[targetColumnIndex].todos,
-        todoToMove,
-      ];
-
-      newColumns[targetColumnIndex] = {
-        ...newColumns[targetColumnIndex],
-        todos: finalTargetTodos,
-      };
-
-      return newColumns;
+      return update(prevColumns, {
+        [sourceColumnIndex]: {
+          todos: {
+            $splice: [
+              [sourceColumn.todos.findIndex((todo) => todo.id === activeId), 1],
+            ],
+          },
+        },
+        [targetColumnIndex]: {
+          todos: { $push: [todoToMove] },
+        },
+      });
     });
   };
 

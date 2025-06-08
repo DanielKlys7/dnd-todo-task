@@ -18,14 +18,13 @@ export function useDebounce<Func extends SomeFunction>(
   }, []);
 
   const debouncedFunction = ((...args) => {
-    const newTimer = setTimeout(() => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
+
+    timer.current = setTimeout(() => {
       func(...args);
     }, delay);
-
-    if (!timer.current) return;
-
-    clearTimeout(timer.current);
-    timer.current = newTimer;
   }) as Func;
 
   return debouncedFunction;

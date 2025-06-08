@@ -73,6 +73,8 @@ const TodoCard = React.memo(({ id, todo, parentId }: TodoCardProps) => {
               e.stopPropagation();
               select(parentId, id);
             }}
+            aria-label={`Select todo: ${todo.title}`}
+            data-testid={`todo-checkbox-${id}`}
           />
         </div>
         <TodoActions

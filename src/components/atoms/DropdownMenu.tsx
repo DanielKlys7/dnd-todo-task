@@ -26,12 +26,23 @@ const DropdownMenu = ({ options, disabled = false }: DropdownMenuProps) => {
 
   return (
     <div className="relative">
-      <Button onClick={toggleMenu} disabled={disabled}>
+      <Button
+        onClick={toggleMenu}
+        disabled={disabled}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-label="Move selected todos to another column"
+        data-testid="main-move-to-button"
+      >
         Move To <ChevronDownIcon className="inline-block w-4 h-4 ml-1" />
       </Button>
       {isOpen && !disabled && (
-        <div className="absolute z-10 mt-2 bg-background border border-primary rounded-md shadow-lg min-w-full w-max max-w-[300px] right-0">
-          <ul className="py-1">
+        <div
+          className="absolute z-10 mt-2 bg-background border border-primary rounded-md shadow-lg min-w-full w-max max-w-[300px] right-0"
+          role="menu"
+          aria-label="Select target column"
+        >
+          <ul className="py-1" role="none">
             {options.map((option) => (
               <DropdownItem
                 key={option.value}

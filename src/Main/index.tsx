@@ -107,18 +107,27 @@ export const Main = () => {
             </div>
 
             <div className="flex flex-row w-full flex-wrap items-center gap-2 justify-start lg:justify-end">
-              <Button onClick={deleteSelected} disabled={!hasSelectedItems}>
+              <Button
+                onClick={deleteSelected}
+                disabled={!hasSelectedItems}
+                aria-label="Delete selected todos"
+                data-testid="main-delete-button"
+              >
                 Delete
               </Button>
               <Button
                 onClick={() => setFinishedStatusOfSelected(true)}
                 disabled={!hasSelectedItems}
+                aria-label="Mark selected todos as done"
+                data-testid="main-mark-done-button"
               >
                 Mark Done
               </Button>
               <Button
                 onClick={() => setFinishedStatusOfSelected(false)}
                 disabled={!hasSelectedItems}
+                aria-label="Mark selected todos as undone"
+                data-testid="main-mark-undone-button"
               >
                 Mark Undone
               </Button>
