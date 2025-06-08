@@ -9,7 +9,7 @@ type ColumnMenuProps = {
   testIdPrefix?: string;
   isNewColumn?: boolean;
   todoCount?: number;
-  dragHandleProps?: React.HTMLAttributes<HTMLDivElement> & {
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement> & {
     "data-cypress"?: string;
   };
 };
